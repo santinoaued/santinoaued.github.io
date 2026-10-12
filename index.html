@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es" data-mode="game">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Santino Aued</title>
+  <!-- Fallback for crawlers; js/main.js replaces it with the text for the current mode and language. -->
+  <meta name="description" content="Santino Aued, Game Developer y Web Developer.">
+  <meta name="theme-color" content="#1F3A2E">
+  <meta property="og:title" content="Santino Aued">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script src="js/content.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-text="ui.skipLink"></a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="#top">Santino Aued</a>
+
+      <div class="site-header__controls">
+        <div class="switch" role="group" data-aria-label="ui.modeSwitchLabel">
+          <button type="button" class="switch__option" data-set-mode="game" aria-pressed="true" data-text="ui.modeGame"></button>
+          <button type="button" class="switch__option" data-set-mode="web" aria-pressed="false" data-text="ui.modeWeb"></button>
+        </div>
+        <div class="switch" role="group" data-aria-label="ui.langSwitchLabel">
+          <button type="button" class="switch__option" data-set-lang="es" lang="es" aria-pressed="true">ES</button>
+          <button type="button" class="switch__option" data-set-lang="en" lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <svg class="hero__contours" viewBox="0 0 800 600" fill="none" aria-hidden="true" focusable="false">
+        <defs>
+          <path id="contour" d="M560 170 C650 175 720 240 715 320 C710 400 650 470 560 465 C470 460 405 410 400 330 C395 250 470 165 560 170 Z"/>
+        </defs>
+        <g stroke="currentColor" stroke-width="1.5">
+          <use href="#contour" transform="translate(560 318) rotate(4) scale(0.3) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(-6) scale(0.55) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(8) scale(0.82) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(-3) scale(1.1) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(10) scale(1.42) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(-8) scale(1.78) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+          <use href="#contour" transform="translate(560 318) rotate(5) scale(2.18) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
+        </g>
+      </svg>
+
+      <div class="container hero__inner">
+        <p class="hero__location" data-text="common.location"></p>
+        <h1 class="hero__title" id="hero-title">
+          <span class="hero__name">Santino Aued</span>
+          <span class="hero__role" data-text="mode.heroTitle"></span>
+        </h1>
+        <span class="hero__rule" aria-hidden="true"></span>
+        <p class="hero__lead" data-text="mode.heroLead"></p>
+        <div class="hero__actions" id="hero-actions"></div>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="container about">
+        <figure class="about__photo">
+          <img src="assets/img/photo-santino.jpg" data-alt="common.photoAlt" alt="" width="800" height="1000" loading="lazy">
+        </figure>
+        <div class="about__intro">
+          <h2 class="section__title" id="about-title" data-text="common.aboutTitle"></h2>
+          <p class="about__text" data-text="common.about"></p>
+          <p class="about__text" data-text="common.aboutPassion"></p>
+        </div>
+        <div class="about__aside">
+          <h3 class="about__subtitle" data-text="common.howIWorkTitle"></h3>
+          <ul class="principles" id="how-i-work"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--band" id="experience" aria-labelledby="experience-title">
+      <div class="container">
+        <h2 class="section__title" id="experience-title" data-text="common.experienceTitle"></h2>
+        <article class="experience">
+          <h3 class="experience__role" data-text="common.experienceRole"></h3>
+          <p class="experience__text" data-text="common.experienceText"></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="tech" aria-labelledby="tech-title">
+      <div class="container">
+        <h2 class="section__title" id="tech-title" data-text="common.techTitle"></h2>
+        <div class="tech" id="tech-groups"></div>
+      </div>
+    </section>
+
+    <section class="section section--band" id="projects" aria-labelledby="projects-title">
+      <div class="container">
+        <h2 class="section__title" id="projects-title" data-text="common.projectsTitle"></h2>
+        <p class="section__lead" data-text="mode.projectsLead"></p>
+        <div id="projects-content"></div>
+      </div>
+    </section>
+
+    <section class="section section--dark" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <h2 class="section__title" id="contact-title" data-text="common.contactTitle"></h2>
+        <p class="contact__lead" data-text="mode.contactLead"></p>
+        <ul class="contact-list" id="contact-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p>&copy; <span id="year"></span> Santino Aued</p>
+      <p data-text="common.footerNote"></p>
+    </div>
+  </footer>
+
+  <a class="whatsapp-button" id="whatsapp-button" href="https://wa.me/5493435142378" target="_blank" rel="noopener">
+    <img class="whatsapp-button__icon" src="assets/img/icon-whatsapp.png" alt="" width="22" height="22">
+    <span data-text="ui.whatsappButton"></span>
+    <span class="visually-hidden" data-text="ui.whatsappNote"></span>
+  </a>
+</body>
+</html>
