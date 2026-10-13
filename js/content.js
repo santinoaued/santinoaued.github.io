@@ -80,7 +80,7 @@ const CONTENT = {
       techTitle: "Tecnologías",
       projectsTitle: "Proyectos",
       contactTitle: "Contacto",
-      footerNote: "Hecho a mano con HTML, CSS y JavaScript.",
+      footerNote: "Hecho con vibe coding junto a Claude.",
     },
     game: {
       metaTitle: "Santino Aued · Game Developer",
@@ -205,7 +205,7 @@ const CONTENT = {
       techTitle: "Technologies",
       projectsTitle: "Projects",
       contactTitle: "Contact",
-      footerNote: "Handmade with HTML, CSS and JavaScript.",
+      footerNote: "Built through vibe coding with Claude.",
     },
     game: {
       metaTitle: "Santino Aued · Game Developer",
