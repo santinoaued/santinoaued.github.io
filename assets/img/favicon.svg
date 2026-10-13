@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><clipPath id="c"><rect width="64" height="64" rx="16"/></clipPath></defs>
-  <g clip-path="url(#c)">
-    <rect width="64" height="64" fill="#1F3A2E"/>
-    <circle cx="45" cy="19" r="6" fill="#A6805A"/>
-    <path d="M-2 44 L17 24 L27 34 L39 20 L66 44 V66 H-2 Z" fill="#4A6B4F"/>
-    <path d="M-2 50 Q18 41 34 47 T66 46 V66 H-2 Z" fill="#172C23"/>
-    <path d="M24 66 C40 60 42 54 33 51 C25 48 26 42 37 37" fill="none" stroke="#EFE8DA" stroke-width="4.5" stroke-linecap="round"/>
+  <rect width="64" height="64" rx="16" fill="#1F3A2E"/>
+  <g fill="none" stroke="#EFE8DA" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M30 9 C44 7 57 17 55 31 C53 43 47 47 40 52 C32 57 17 55 12 44 C7 33 14 11 30 9 Z"/>
+    <path d="M31 18 C41 16 48 23 46 32 C45 39 40 42 35 45 C29 48 20 45 19 37 C18 28 22 19 31 18 Z"/>
   </g>
+  <path d="M33 26 C38 26 41 30 40 34 C39 37 36 39 32 39 C28 39 26 35 27 31 C28 28 30 26 33 26 Z" fill="#A6805A"/>
 </svg>
