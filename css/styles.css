@@ -186,10 +186,19 @@ main.is-switching {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   font-family: var(--font-display);
   font-size: var(--text-lg);
   text-decoration: none;
   letter-spacing: -0.01em;
+}
+
+/* 32px keeps each pixel of the 16x16 pine on whole screen pixels */
+.brand__logo {
+  width: 2rem;
+  height: 2rem;
 }
 
 .site-header__controls {
