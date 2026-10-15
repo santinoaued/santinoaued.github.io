@@ -34,21 +34,33 @@
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Santino Aued",
+      "@type": "ProfilePage",
       "url": "https://santinoaued.github.io/",
-      "image": "https://santinoaued.github.io/assets/img/photo-santino.jpg",
-      "jobTitle": ["Game Developer", "Web Developer"],
-      "email": "mailto:santino.aued@gmail.com",
-      "address": { "@type": "PostalAddress", "addressRegion": "Entre Ríos", "addressCountry": "AR" },
-      "affiliation": { "@type": "CollegeOrUniversity", "name": "Universidad Tecnológica Nacional" },
-      "knowsAbout": ["Game development", "Unity", "C#", "Godot", "Web development", "HTML", "CSS", "JavaScript"],
-      "sameAs": [
-        "https://santino-aued.itch.io/",
-        "https://github.com/santinoaued",
-        "https://www.linkedin.com/in/santino-aued/",
-        "https://www.instagram.com/santi.aued/"
-      ]
+      "name": "Santino Aued · Game Developer & Web Developer",
+      "mainEntity": {
+        "@type": "Person",
+        "@id": "https://santinoaued.github.io/#person",
+        "name": "Santino Aued",
+        "url": "https://santinoaued.github.io/",
+        "image": {
+          "@type": "ImageObject",
+          "url": "https://santinoaued.github.io/assets/img/santino-aued.jpg",
+          "width": 800,
+          "height": 1000,
+          "caption": "Santino Aued"
+        },
+        "jobTitle": ["Game Developer", "Web Developer"],
+        "email": "mailto:santino.aued@gmail.com",
+        "address": { "@type": "PostalAddress", "addressRegion": "Entre Ríos", "addressCountry": "AR" },
+        "affiliation": { "@type": "CollegeOrUniversity", "name": "Universidad Tecnológica Nacional" },
+        "knowsAbout": ["Game development", "Unity", "C#", "Godot", "Web development", "HTML", "CSS", "JavaScript"],
+        "sameAs": [
+          "https://santino-aued.itch.io/",
+          "https://github.com/santinoaued",
+          "https://www.linkedin.com/in/santino-aued/",
+          "https://www.instagram.com/santi.aued/"
+        ]
+      }
     }
   </script>
 
@@ -119,7 +131,7 @@
     <section class="section" id="about" aria-labelledby="about-title">
       <div class="container about">
         <figure class="about__photo">
-          <img src="assets/img/photo-santino.jpg" data-alt="common.photoAlt" alt="" width="800" height="1000" loading="lazy">
+          <img src="assets/img/santino-aued.jpg" data-alt="common.photoAlt" alt="Santino Aued" width="800" height="1000" loading="lazy">
         </figure>
         <div class="about__intro">
           <h2 class="section__title" id="about-title" data-text="common.aboutTitle"></h2>
