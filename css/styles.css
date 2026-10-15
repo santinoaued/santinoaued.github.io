@@ -60,6 +60,7 @@
   /* Motion */
   --duration: 180ms;
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 :root[data-mode="web"] {
@@ -837,11 +838,71 @@ main.is-switching {
   height: 1.375rem;
 }
 
+/* ---------- Intro ---------- */
+
+/* Registered so the mask radius can animate; without support the overlay just disappears at the end */
+@property --intro-hole {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--color-forest);
+  pointer-events: none;
+  -webkit-mask: radial-gradient(circle at center, transparent var(--intro-hole), #000 calc(var(--intro-hole) + 1px));
+  mask: radial-gradient(circle at center, transparent var(--intro-hole), #000 calc(var(--intro-hole) + 1px));
+  animation: intro-open 900ms var(--ease) 700ms forwards;
+}
+
+.intro__logo {
+  width: 6rem;
+  height: 6rem;
+  animation: intro-logo 1600ms var(--ease) forwards;
+}
+
+@keyframes intro-open {
+  to {
+    --intro-hole: 75vmax;
+    visibility: hidden;
+  }
+}
+
+@keyframes intro-logo {
+  0% { opacity: 0; transform: scale(0.6); }
+  35%, 45% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(3); }
+}
+
+/* ---------- Scroll reveal ---------- */
+
+/* Added by js/main.js, so without JS everything stays visible */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.96);
+  transition: opacity 450ms var(--ease), transform 550ms var(--ease-pop);
+  transition-delay: calc(var(--reveal-index, 0) * 70ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .intro {
+    display: none;
   }
 
   *,

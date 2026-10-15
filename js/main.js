@@ -242,6 +242,29 @@ function updateSwitches() {
   });
 }
 
+// Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
+const REVEAL_SELECTOR =
+  ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
+  ".experience, .tech__group, .projects__subtitle, .featured > li, .cards > li, .empty-state, " +
+  ".contact__lead, .contact-list > li";
+
+const revealObserver = new IntersectionObserver(
+  (entries) => entries.forEach((entry) => entry.target.classList.toggle("is-visible", entry.isIntersecting)),
+  { threshold: 0.15 }
+);
+
+// Runs after every render because mode/language switches replace the lists.
+function observeReveals() {
+  if (reducedMotion.matches) return;
+  revealObserver.disconnect();
+  document.querySelectorAll(REVEAL_SELECTOR).forEach((element) => {
+    const siblingIndex = [...element.parentElement.children].indexOf(element);
+    element.classList.add("reveal");
+    element.style.setProperty("--reveal-index", Math.min(siblingIndex, 5));
+    revealObserver.observe(element);
+  });
+}
+
 function renderPage() {
   const scope = getTextScope();
   const root = document.documentElement;
@@ -259,6 +282,7 @@ function renderPage() {
   renderContact(scope);
   renderWhatsappButton(scope);
   updateSwitches();
+  observeReveals();
 }
 
 // ---------- Init ----------
