@@ -72,6 +72,8 @@ function setState(changes) {
   if (next.mode === state.mode && next.lang === state.lang) return;
 
   Object.assign(state, next);
+  // Only the first load waits for the intro; switches type right away.
+  document.querySelector(".hero__role").style.setProperty("--typing-delay", "0ms");
   updateSwitches();
   syncUrl();
   saveState();
@@ -265,6 +267,15 @@ function observeReveals() {
   });
 }
 
+// Restarts the CSS typing animation on the hero role (see .hero__role in styles.css).
+function typeHeroRole() {
+  const role = document.querySelector(".hero__role");
+  role.style.setProperty("--chars", role.textContent.length);
+  role.classList.remove("is-typing");
+  void role.offsetWidth; // force reflow so the animation starts again from the first key
+  role.classList.add("is-typing");
+}
+
 function renderPage() {
   const scope = getTextScope();
   const root = document.documentElement;
@@ -275,6 +286,7 @@ function renderPage() {
   document.querySelector('meta[name="description"]').setAttribute("content", scope.mode.metaDescription);
 
   renderTextNodes(scope);
+  typeHeroRole();
   renderHeroActions(scope);
   renderHowIWork(scope);
   renderTech(scope);

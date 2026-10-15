@@ -30,6 +30,7 @@
   /* Typography */
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-code: "JetBrains Mono", Consolas, monospace;
   --text-sm: 0.875rem;
   --text-base: 1.0625rem;
   --text-lg: 1.25rem;
@@ -316,10 +317,32 @@ main.is-switching {
   color: var(--color-earth);
 }
 
+/* Typed in with a steps() width animation; --chars is set by js/main.js.
+   Mono font makes 1ch exactly one character, so the width lands on whole letters. */
 .hero__role {
-  font-size: var(--text-display);
-  font-weight: 350;
-  letter-spacing: -0.02em;
+  overflow: hidden;
+  width: calc(var(--chars) * 1ch);
+  max-width: 100%;
+  /* Shrinks on narrow screens so the longest role (14 chars) fits on one line */
+  font-size: min(var(--text-display), calc((100vw - 2 * var(--gutter)) / 8.6));
+  font-family: var(--font-code);
+  font-weight: 400;
+  white-space: nowrap;
+  border-right: 0.08em solid var(--accent);
+}
+
+.hero__role.is-typing {
+  animation:
+    typing calc(var(--chars) * 70ms) steps(var(--chars)) var(--typing-delay, 1300ms) both,
+    caret 0.8s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+}
+
+@keyframes caret {
+  50% { border-color: transparent; }
 }
 
 .hero__rule {
@@ -903,6 +926,10 @@ main.is-switching {
 
   .intro {
     display: none;
+  }
+
+  .hero__role.is-typing {
+    animation: none;
   }
 
   *,
