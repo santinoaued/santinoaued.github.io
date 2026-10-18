@@ -72,8 +72,6 @@ function setState(changes) {
   if (next.mode === state.mode && next.lang === state.lang) return;
 
   Object.assign(state, next);
-  // Only the first load waits for the intro; switches type right away.
-  document.querySelector(".hero__role").style.setProperty("--typing-delay", "0ms");
   updateSwitches();
   syncUrl();
   saveState();
@@ -341,12 +339,30 @@ function observeReveals() {
 }
 
 // Restarts the CSS typing animation on the hero role (see .hero__role in styles.css).
-function typeHeroRole() {
+// Types the hero role one letter at a time. The full text lives in a visually hidden
+// sibling for screen readers; the typed copy is aria-hidden.
+const INTRO_DURATION_MS = 1300;
+const TYPING_STEP_MS = 70;
+let typingTimer = 0;
+let hasTyped = false;
+
+function typeHeroRole(scope) {
   const role = document.querySelector(".hero__role");
-  role.style.setProperty("--chars", role.textContent.length);
-  role.classList.remove("is-typing");
-  void role.offsetWidth; // force reflow so the animation starts again from the first key
-  role.classList.add("is-typing");
+  const text = scope.mode.heroTitle;
+  clearTimeout(typingTimer);
+  if (reducedMotion.matches) {
+    role.textContent = text;
+    return;
+  }
+  role.textContent = "";
+  let length = 0;
+  const typeNext = () => {
+    role.textContent = text.slice(0, ++length);
+    if (length < text.length) typingTimer = setTimeout(typeNext, TYPING_STEP_MS);
+  };
+  // Only the first load waits for the intro; switches type right away
+  typingTimer = setTimeout(typeNext, hasTyped ? 0 : INTRO_DURATION_MS);
+  hasTyped = true;
 }
 
 function renderPage() {
@@ -359,7 +375,7 @@ function renderPage() {
   document.querySelector('meta[name="description"]').setAttribute("content", scope.mode.metaDescription);
 
   renderTextNodes(scope);
-  typeHeroRole();
+  typeHeroRole(scope);
   renderHeroActions(scope);
   renderHowIWork(scope);
   renderTech(scope);

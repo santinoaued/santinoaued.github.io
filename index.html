@@ -67,11 +67,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=20261018">
 
-  <script src="js/content.js" defer></script>
-  <script src="js/main.js" defer></script>
-  <script src="js/scene.js" defer></script>
+  <script src="js/content.js?v=20261018" defer></script>
+  <script src="js/main.js?v=20261018" defer></script>
+  <script src="js/scene.js?v=20261018" defer></script>
 </head>
 <body>
   <!-- Intro: the logo opens from its center to reveal the page. Pure CSS, removes itself. -->
@@ -108,7 +108,8 @@
         <p class="hero__location" data-text="common.location"></p>
         <h1 class="hero__title" id="hero-title">
           <span class="hero__name">Santino Aued</span>
-          <span class="hero__role" data-text="mode.heroTitle"></span>
+          <span class="visually-hidden" data-text="mode.heroTitle"></span>
+          <span class="hero__role" aria-hidden="true"></span>
         </h1>
         <span class="hero__rule" aria-hidden="true"></span>
         <p class="hero__lead" data-text="mode.heroLead"></p>
