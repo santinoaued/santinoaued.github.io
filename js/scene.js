@@ -47,19 +47,22 @@ function startHeroScene() {
     };
   }
 
+  // Tiers with concave sides and an upturned bottom edge read as drooping branches
   function drawPine(ctx, x, baseY, treeHeight, color) {
-    const treeWidth = treeHeight * 0.42;
+    const treeWidth = treeHeight * 0.44;
+    const tiers = 7;
     ctx.fillStyle = color;
-    ctx.fillRect(x - treeHeight * 0.02, baseY - treeHeight * 0.12, treeHeight * 0.04, treeHeight * 0.12);
-    for (let tier = 0; tier < 4; tier++) {
-      const top = baseY - treeHeight + tier * treeHeight * 0.2;
-      const bottom = top + treeHeight * 0.36;
-      const halfWidth = (treeWidth * (0.4 + tier * 0.2)) / 2;
+    ctx.fillRect(x - treeHeight * 0.015, baseY - treeHeight * 0.1, treeHeight * 0.03, treeHeight * 0.1);
+    for (let tier = 0; tier < tiers; tier++) {
+      const top = baseY - treeHeight + tier * treeHeight * 0.12;
+      const tierHeight = treeHeight * 0.22;
+      const bottom = top + tierHeight;
+      const halfWidth = (treeWidth * (0.22 + (tier / (tiers - 1)) * 0.78)) / 2;
       ctx.beginPath();
       ctx.moveTo(x, top);
-      ctx.lineTo(x + halfWidth, bottom);
-      ctx.lineTo(x - halfWidth, bottom);
-      ctx.closePath();
+      ctx.quadraticCurveTo(x - halfWidth * 0.3, bottom - tierHeight * 0.25, x - halfWidth, bottom);
+      ctx.quadraticCurveTo(x, bottom - tierHeight * 0.3, x + halfWidth, bottom);
+      ctx.quadraticCurveTo(x + halfWidth * 0.3, bottom - tierHeight * 0.25, x, top);
       ctx.fill();
     }
   }
