@@ -47,6 +47,9 @@ const CONTENT = {
       modeWeb: "Web Dev",
       langSwitchLabel: "Elegir idioma",
       newTab: "(se abre en otra pestaña)",
+      sliderLabel: "Proyectos y perfiles",
+      sliderPrev: "Anterior",
+      sliderNext: "Siguiente",
       whatsappButton: "Escribime",
       whatsappNote: "por WhatsApp (se abre en otra pestaña)",
       whatsappMessage: "Hola Santino, vi tu portfolio y quería escribirte.",
@@ -100,7 +103,6 @@ const CONTENT = {
         { title: "Gestión y producción", items: ["Notion", "GitHub", "Trello"] },
       ],
       projectsLead: "Mis juegos, mi código y mi recorrido, cada cosa en su lugar.",
-      featuredTitle: "Destacados",
       featured: [
         {
           id: "resurge",
@@ -111,7 +113,6 @@ const CONTENT = {
           imageAlt: "Portada de Resurge: un pequeño robot blanco asomándose entre chatarra oxidada, con la insignia de tercer puesto de la Jam de Videojuegos UTN.",
         },
       ],
-      platformsTitle: "Dónde encontrar más",
       projects: [
         {
           id: "itch",
@@ -171,6 +172,9 @@ const CONTENT = {
       modeWeb: "Web Dev",
       langSwitchLabel: "Choose language",
       newTab: "(opens in a new tab)",
+      sliderLabel: "Projects and profiles",
+      sliderPrev: "Previous",
+      sliderNext: "Next",
       whatsappButton: "Message me",
       whatsappNote: "on WhatsApp (opens in a new tab)",
       whatsappMessage: "Hi Santino, I saw your portfolio and wanted to get in touch.",
@@ -224,7 +228,6 @@ const CONTENT = {
         { title: "Management and production", items: ["Notion", "GitHub", "Trello"] },
       ],
       projectsLead: "My games, my code and my background, each in its own place.",
-      featuredTitle: "Featured",
       featured: [
         {
           id: "resurge",
@@ -235,7 +238,6 @@ const CONTENT = {
           imageAlt: "Resurge cover art: a small white robot peeking out from rusty scrap, with the UTN Video Game Jam third place badge.",
         },
       ],
-      platformsTitle: "Where to find more",
       projects: [
         {
           id: "itch",

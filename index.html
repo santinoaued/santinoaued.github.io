@@ -71,6 +71,7 @@
 
   <script src="js/content.js" defer></script>
   <script src="js/main.js" defer></script>
+  <script src="js/scene.js" defer></script>
 </head>
 <body>
   <!-- Intro: the logo opens from its center to reveal the page. Pure CSS, removes itself. -->
@@ -101,20 +102,7 @@
 
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
-      <svg class="hero__contours" viewBox="0 0 800 600" fill="none" aria-hidden="true" focusable="false">
-        <defs>
-          <path id="contour" d="M560 170 C650 175 720 240 715 320 C710 400 650 470 560 465 C470 460 405 410 400 330 C395 250 470 165 560 170 Z"/>
-        </defs>
-        <g stroke="currentColor" stroke-width="1.5">
-          <use href="#contour" transform="translate(560 318) rotate(4) scale(0.3) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(-6) scale(0.55) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(8) scale(0.82) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(-3) scale(1.1) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(10) scale(1.42) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(-8) scale(1.78) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-          <use href="#contour" transform="translate(560 318) rotate(5) scale(2.18) translate(-560 -318)" vector-effect="non-scaling-stroke"/>
-        </g>
-      </svg>
+      <canvas class="hero__scene" id="hero-scene" aria-hidden="true"></canvas>
 
       <div class="container hero__inner">
         <p class="hero__location" data-text="common.location"></p>

@@ -151,7 +151,7 @@ function renderCard(project, ui) {
     : `<span class="card__name">${project.name}</span>`;
 
   return `
-    <li>
+    <li class="slide">
       <a class="card" data-platform="${project.id}" href="${LINKS[project.id].href}" target="_blank" rel="noopener">
         <div class="card__media" aria-hidden="true">${media}</div>
         <div class="card__body">
@@ -167,7 +167,7 @@ function renderCard(project, ui) {
 function renderFeatured(project, ui) {
   const data = FEATURED_PROJECTS[project.id];
   return `
-    <li>
+    <li class="slide slide--featured">
       <article class="featured-card">
         <div class="featured-card__media">
           <img src="${data.image}" alt="${project.imageAlt}" width="${data.width}" height="${data.height}" loading="lazy">
@@ -189,11 +189,19 @@ function renderProjects(scope) {
   const { projects, featured, emptyProjects } = scope.mode;
 
   if (projects) {
+    const slides =
+      featured.map((project) => renderFeatured(project, scope.ui)).join("") +
+      projects.map((project) => renderCard(project, scope.ui)).join("");
     container.innerHTML = `
-      <h3 class="projects__subtitle">${scope.mode.featuredTitle}</h3>
-      <ul class="featured">${featured.map((project) => renderFeatured(project, scope.ui)).join("")}</ul>
-      <h3 class="projects__subtitle">${scope.mode.platformsTitle}</h3>
-      <ul class="cards">${projects.map((project) => renderCard(project, scope.ui)).join("")}</ul>`;
+      <div class="slider">
+        <ul class="slider__track" tabindex="0" aria-label="${scope.ui.sliderLabel}">${slides}</ul>
+        <div class="slider__controls">
+          <button type="button" class="slider__button" data-slide="-1" aria-label="${scope.ui.sliderPrev}">&larr;</button>
+          <div class="slider__progress" aria-hidden="true"><span></span></div>
+          <button type="button" class="slider__button" data-slide="1" aria-label="${scope.ui.sliderNext}">&rarr;</button>
+        </div>
+      </div>`;
+    updateSlider(container.querySelector(".slider__track"));
     return;
   }
   container.innerHTML = `
@@ -201,6 +209,71 @@ function renderProjects(scope) {
       <p class="empty-state__text">${emptyProjects.text}</p>
       <a class="button button--primary" href="#contact">${emptyProjects.cta}</a>
     </div>`;
+}
+
+// Progress bar and arrow states follow the scroll position of the track.
+function updateSlider(track) {
+  const slider = track.closest(".slider");
+  const maxScroll = track.scrollWidth - track.clientWidth;
+  const progress = maxScroll > 0 ? (track.scrollLeft + track.clientWidth) / track.scrollWidth : 1;
+  slider.style.setProperty("--progress", `${Math.round(progress * 100)}%`);
+  slider.querySelector('[data-slide="-1"]').disabled = track.scrollLeft <= 1;
+  slider.querySelector('[data-slide="1"]').disabled = track.scrollLeft >= maxScroll - 1;
+}
+
+// Listeners live on the static container because the slider is re-rendered on every switch.
+function initSlider() {
+  const container = document.getElementById("projects-content");
+  let drag = null;
+
+  container.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-slide]");
+    if (button) {
+      const track = container.querySelector(".slider__track");
+      const step = track.querySelector(".slide").offsetWidth;
+      track.scrollBy({ left: Number(button.dataset.slide) * step, behavior: reducedMotion.matches ? "auto" : "smooth" });
+    }
+    // A drag that moved should not open the card underneath
+    if (drag && drag.moved) event.preventDefault();
+  }, true);
+
+  container.addEventListener("scroll", (event) => {
+    if (event.target.classList.contains("slider__track")) updateSlider(event.target);
+  }, true);
+
+  // Mouse drag; touch and trackpads already scroll natively
+  container.addEventListener("dragstart", (event) => {
+    if (event.target.closest(".slider__track")) event.preventDefault(); // no native link/image dragging
+  });
+  container.addEventListener("pointerdown", (event) => {
+    const track = event.target.closest(".slider__track");
+    if (!track || event.pointerType !== "mouse") return;
+    drag = { track, startX: event.clientX, startScroll: track.scrollLeft, moved: false };
+  });
+  window.addEventListener("pointermove", (event) => {
+    if (!drag) return;
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 5) {
+      drag.moved = true;
+      drag.track.classList.add("is-dragging");
+    }
+    drag.track.scrollLeft = drag.startScroll - distance;
+  });
+  window.addEventListener("pointerup", () => {
+    if (!drag) return;
+    drag.track.classList.remove("is-dragging"); // snap takes over again and settles on a slide
+    setTimeout(() => (drag = null)); // keep "moved" until the click that follows pointerup
+  });
+}
+
+// Header is transparent over the forest scene and solid once the page scrolls past it.
+function initHeader() {
+  const header = document.querySelector(".site-header");
+  const hero = document.getElementById("top");
+  // Turns solid before the hero's bottom fade reaches the header, so its light text never sits on linen
+  new IntersectionObserver(([entry]) => header.classList.toggle("is-over-hero", entry.intersectionRatio >= 0.6), {
+    threshold: 0.6,
+  }).observe(hero);
 }
 
 function renderContact(scope) {
@@ -247,7 +320,7 @@ function updateSwitches() {
 // Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
 const REVEAL_SELECTOR =
   ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
-  ".experience, .tech__group, .projects__subtitle, .featured > li, .cards > li, .empty-state, " +
+  ".experience, .tech__group, .slide, .empty-state, " +
   ".contact__lead, .contact-list > li";
 
 const revealObserver = new IntersectionObserver(
@@ -307,5 +380,7 @@ document.querySelectorAll("[data-set-lang]").forEach((button) => {
 });
 
 document.getElementById("year").textContent = new Date().getFullYear();
+initSlider();
+initHeader();
 renderPage();
 syncUrl();

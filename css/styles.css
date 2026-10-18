@@ -160,22 +160,43 @@ img {
 }
 
 main {
-  transition: opacity var(--duration) var(--ease);
+  transition: opacity 260ms var(--ease), filter 260ms var(--ease);
 }
 
+/* Mode/language switch: the content fogs out and back in */
 main.is-switching {
   opacity: 0;
+  filter: blur(10px);
 }
 
 /* ---------- Header ---------- */
 
 .site-header {
-  position: sticky;
+  position: fixed;
+  inset-inline: 0;
   top: 0;
   z-index: 10;
   background: var(--color-linen-glass);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--color-line);
+  transition: background-color 300ms var(--ease), border-color 300ms var(--ease), color 300ms var(--ease);
+}
+
+/* Transparent while it sits over the forest scene */
+.site-header.is-over-hero {
+  color: var(--color-linen-light);
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
+.site-header.is-over-hero .switch {
+  background: var(--color-hover-on-dark);
+  border-color: var(--color-line-on-dark);
+}
+
+.site-header.is-over-hero .switch__option {
+  color: var(--color-linen-muted);
 }
 
 .site-header__inner {
@@ -277,24 +298,37 @@ main.is-switching {
 
 .hero {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
   overflow: hidden;
-  padding-block: var(--space-8) var(--space-9);
+  /* Room for the fixed header */
+  padding-block: 8rem var(--space-9);
+  color: var(--color-linen-light);
+  background: var(--color-forest);
 }
 
-.hero__contours {
+.hero__scene {
   position: absolute;
-  top: 0;
-  right: -45%;
-  width: 150%;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  color: var(--accent);
-  opacity: 0.16;
+}
+
+/* Darkens the left side for text contrast and fades the bottom into the page */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(23, 44, 35, 0.78) 0%, rgba(23, 44, 35, 0.4) 45%, transparent 75%),
+    linear-gradient(180deg, transparent 72%, var(--color-linen) 100%);
   pointer-events: none;
-  transition: color var(--duration) var(--ease);
 }
 
 .hero__inner {
   position: relative;
+  z-index: 1;
 }
 
 .hero__location {
@@ -302,7 +336,7 @@ main.is-switching {
   font-size: var(--text-sm);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: var(--color-linen-muted);
 }
 
 .hero__title {
@@ -314,7 +348,7 @@ main.is-switching {
 .hero__name {
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  color: var(--color-earth);
+  color: var(--color-linen-muted);
 }
 
 /* Typed in with a steps() width animation; --chars is set by js/main.js.
@@ -328,7 +362,7 @@ main.is-switching {
   font-family: var(--font-code);
   font-weight: 400;
   white-space: nowrap;
-  border-right: 0.08em solid var(--accent);
+  border-right: 0.08em solid var(--accent-on-dark);
 }
 
 .hero__role.is-typing {
@@ -350,7 +384,7 @@ main.is-switching {
   width: 4.5rem;
   height: 3px;
   margin-block: var(--space-6);
-  background: var(--accent);
+  background: var(--accent-on-dark);
   border-radius: var(--radius-pill);
   transition: background-color var(--duration) var(--ease);
 }
@@ -358,7 +392,7 @@ main.is-switching {
 .hero__lead {
   max-width: 34ch;
   font-size: var(--text-lg);
-  color: var(--color-muted);
+  color: var(--color-linen);
 }
 
 .hero__actions {
@@ -368,11 +402,13 @@ main.is-switching {
   margin-top: var(--space-6);
 }
 
-@media (min-width: 56rem) {
-  .hero__contours {
-    right: -10%;
-    width: 75%;
-  }
+.hero .button--ghost {
+  color: var(--color-linen-light);
+  border-color: var(--color-linen-muted);
+}
+
+.hero .button--ghost:hover {
+  background: var(--color-hover-on-dark);
 }
 
 /* ---------- Sections ---------- */
@@ -552,46 +588,130 @@ main.is-switching {
   }
 }
 
-/* ---------- Featured projects ---------- */
+/* ---------- Projects slider ---------- */
 
-.projects__subtitle {
-  margin-bottom: var(--space-4);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.featured {
-  display: grid;
+/* Native horizontal scroll with snap: touch and trackpads work for free,
+   main.js adds mouse drag and the arrow buttons */
+.slider__track {
+  display: flex;
   gap: var(--space-5);
-  margin: 0 0 var(--space-7);
-  padding: 0;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: var(--space-2) var(--gutter) var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  overscroll-behavior-x: contain;
   list-style: none;
+  scrollbar-width: none;
+  cursor: grab;
 }
+
+.slider__track::-webkit-scrollbar {
+  display: none;
+}
+
+.slider__track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.slider__track img {
+  -webkit-user-drag: none;
+}
+
+.slide {
+  flex: 0 0 clamp(16rem, 78vw, 21rem);
+  scroll-snap-align: start;
+}
+
+.slide--featured {
+  flex-basis: clamp(16rem, 86vw, 34rem);
+}
+
+.slider__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.slider__button {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--accent);
+  background: var(--color-linen-light);
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease), opacity var(--duration) var(--ease);
+}
+
+.slider__button:hover:not(:disabled) {
+  color: var(--color-linen-light);
+  background: var(--accent);
+}
+
+.slider__button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.slider__progress {
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-line);
+  border-radius: var(--radius-pill);
+}
+
+.slider__progress span {
+  display: block;
+  width: var(--progress, 0%);
+  height: 100%;
+  background: var(--accent);
+  transition: width 200ms var(--ease);
+}
+
+/* ---------- Featured project ---------- */
 
 .featured-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   overflow: hidden;
   background: var(--color-linen-light);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
 }
 
+.featured-card__media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
 .featured-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
+  transition: transform 600ms var(--ease);
+}
+
+.featured-card:hover .featured-card__media img {
+  transform: scale(1.04);
 }
 
 .featured-card__body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  flex: 1;
   gap: var(--space-4);
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6) var(--space-6);
 }
 
 .featured-card__badge {
@@ -611,25 +731,7 @@ main.is-switching {
   color: var(--color-muted);
 }
 
-@media (min-width: 48rem) {
-  .featured-card {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  }
-
-  .featured-card__body {
-    padding: var(--space-7) var(--space-6);
-  }
-}
-
 /* ---------- Project cards ---------- */
-
-.cards {
-  display: grid;
-  gap: var(--space-5);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
 .card {
   display: flex;
@@ -711,18 +813,6 @@ main.is-switching {
 
 .card:hover .card__arrow {
   transform: translateX(3px);
-}
-
-@media (min-width: 40rem) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 62rem) {
-  .cards {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 /* ---------- Empty projects (web mode) ---------- */
