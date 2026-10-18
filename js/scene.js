@@ -31,6 +31,7 @@ function startHeroScene() {
   let height = 0;
   let ridgeLayers = [];
   let fogBlobs = [];
+  let fogSprite = null;
   let raindrops = [];
   let wind = 0.2;
   const mouse = { x: 0.5, y: 0.5, smoothX: 0.5, smoothY: 0.5 };
@@ -70,13 +71,22 @@ function startHeroScene() {
   // Each ridge is drawn once into its own wider canvas, then only moved per frame
   function buildRidges() {
     const random = seededRandom(7);
-    ridgeLayers = RIDGES.map((ridge) => {
+    ridgeLayers = RIDGES.map((ridge, index) => {
       const layer = document.createElement("canvas");
       layer.width = Math.ceil(width * (1 + PARALLAX * 2));
       layer.height = height;
       const ctx = layer.getContext("2d");
       const baseY = height * ridge.base;
       const treeSize = height * ridge.size;
+
+      // The sky is baked into the farthest layer so it isn't repainted every frame
+      if (index === 0) {
+        const sky = ctx.createLinearGradient(0, 0, 0, height);
+        sky.addColorStop(0, SKY_TOP);
+        sky.addColorStop(0.7, SKY_BOTTOM);
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, layer.width, height);
+      }
 
       ctx.fillStyle = ridge.color;
       ctx.beginPath();
@@ -94,6 +104,17 @@ function startHeroScene() {
       return { canvas: layer, depth: ridge.depth };
     });
 
+    // One soft fog puff rendered once; each blob stamps it scaled, which is far cheaper
+    // than filling a fresh full-screen radial gradient per blob per frame
+    fogSprite = document.createElement("canvas");
+    fogSprite.width = fogSprite.height = 128;
+    const spriteContext = fogSprite.getContext("2d");
+    const puff = spriteContext.createRadialGradient(64, 64, 0, 64, 64, 64);
+    puff.addColorStop(0, `rgba(${FOG_RGB}, 1)`);
+    puff.addColorStop(1, `rgba(${FOG_RGB}, 0)`);
+    spriteContext.fillStyle = puff;
+    spriteContext.fillRect(0, 0, 128, 128);
+
     fogBlobs = Array.from({ length: 10 }, (_, index) => ({
       x: random() * width,
       y: height * (0.5 + (index % 3) * 0.14 + random() * 0.08),
@@ -110,10 +131,10 @@ function startHeroScene() {
     }));
   }
 
+  // Drawn at 1x on purpose: fog and rain hide the softness, and hi-DPI would more than double the pixels per frame
   function resize() {
-    const scale = Math.min(window.devicePixelRatio || 1, 1.5);
-    width = Math.round(hero.clientWidth * scale);
-    height = Math.round(hero.clientHeight * scale);
+    width = hero.clientWidth;
+    height = hero.clientHeight;
     if (!width || !height) return; // not laid out yet (hidden tab, zero-size preview)
     canvas.width = width;
     canvas.height = height;
@@ -122,12 +143,6 @@ function startHeroScene() {
   }
 
   function drawFrame(time) {
-    const sky = context.createLinearGradient(0, 0, 0, height);
-    sky.addColorStop(0, SKY_TOP);
-    sky.addColorStop(0.7, SKY_BOTTOM);
-    context.fillStyle = sky;
-    context.fillRect(0, 0, width, height);
-
     // Wind follows the cursor, plus slow gusts
     const gust = Math.sin(time * 0.0007) * 0.25 + Math.sin(time * 0.0019) * 0.1;
     const targetWind = 0.25 + (mouse.x - 0.5) * 0.9 + gust;
@@ -137,19 +152,18 @@ function startHeroScene() {
 
     ridgeLayers.forEach((layer, index) => {
       const shiftX = -(mouse.smoothX - 0.5) * layer.depth * width * PARALLAX;
-      const shiftY = -(mouse.smoothY - 0.5) * layer.depth * height * 0.03;
+      // The far layer carries the sky and must cover the whole canvas, so it only moves sideways
+      const shiftY = index === 0 ? 0 : -(mouse.smoothY - 0.5) * layer.depth * height * 0.03;
       context.drawImage(layer.canvas, -width * PARALLAX + shiftX, shiftY);
 
       // Fog drifts between ridges
       fogBlobs.forEach((blob, blobIndex) => {
         if (blobIndex % ridgeLayers.length !== index) return;
         if (isAnimated) blob.x = (blob.x + blob.speed * (0.5 + wind) + width * 1.5) % (width * 1.5);
-        const fog = context.createRadialGradient(blob.x - width * 0.25, blob.y, 0, blob.x - width * 0.25, blob.y, blob.radius);
-        fog.addColorStop(0, `rgba(${FOG_RGB}, ${blob.alpha})`);
-        fog.addColorStop(1, `rgba(${FOG_RGB}, 0)`);
-        context.fillStyle = fog;
-        context.fillRect(0, 0, width, height);
+        context.globalAlpha = blob.alpha;
+        context.drawImage(fogSprite, blob.x - width * 0.25 - blob.radius, blob.y - blob.radius, blob.radius * 2, blob.radius * 2);
       });
+      context.globalAlpha = 1;
     });
 
     FRONT_PINES.forEach((pine) => {
@@ -179,8 +193,10 @@ function startHeroScene() {
 
       // Fog closes over the scene as the hero scrolls away
       const scrolled = Math.min(window.scrollY / hero.clientHeight, 1);
-      context.fillStyle = `rgba(${FOG_RGB}, ${scrolled * 0.85})`;
-      context.fillRect(0, 0, width, height);
+      if (scrolled > 0) {
+        context.fillStyle = `rgba(${FOG_RGB}, ${scrolled * 0.85})`;
+        context.fillRect(0, 0, width, height);
+      }
     }
   }
 
