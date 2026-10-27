@@ -584,27 +584,28 @@ main.is-switching {
   font-size: var(--text-lg);
 }
 
-/* Native horizontal scroll (no snap, so main.js can drift it continuously);
-   touch and trackpads work for free, main.js adds mouse drag and the buttons */
-.slider__track {
-  display: flex;
-  gap: var(--space-5);
+/* main.js moves the track with a transform; the viewport only clips it.
+   pan-y lets vertical swipes keep scrolling the page while horizontal ones drag the carousel. */
+.slider__viewport {
   margin: 0 calc(-1 * var(--gutter));
   padding: var(--space-2) var(--gutter) var(--space-5);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  list-style: none;
-  scrollbar-width: none;
+  overflow: hidden;
+  touch-action: pan-y;
   cursor: grab;
 }
 
-.slider__track::-webkit-scrollbar {
-  display: none;
-}
-
-.slider__track.is-dragging {
+.slider__viewport.is-dragging {
   cursor: grabbing;
   user-select: none;
+}
+
+.slider__track {
+  display: flex;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
 }
 
 .slider__track img {

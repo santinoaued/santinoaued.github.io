@@ -188,15 +188,17 @@ function renderProjects(scope) {
   const { projects, featured, emptyProjects } = scope.mode;
 
   if (projects) {
-    // Three sets of cards: one real, two copies, so even a wide screen always has room to loop
-    const cards = [false, true, true]
+    // Real cards in the middle, a copy on each side, so the loop never shows an edge
+    const cards = [true, false, true]
       .map((isCopy) => projects.map((project) => renderCard(project, scope.ui, isCopy)).join(""))
       .join("");
     container.innerHTML = `
       <ul class="featured">${featured.map((project) => renderFeatured(project, scope.ui)).join("")}</ul>
       <h3 class="projects__subtitle">${scope.mode.profilesTitle}</h3>
       <div class="slider">
-        <ul class="slider__track" tabindex="0" aria-label="${scope.ui.sliderLabel}" data-sets="3">${cards}</ul>
+        <div class="slider__viewport">
+          <ul class="slider__track" aria-label="${scope.ui.sliderLabel}" data-period-cards="${projects.length}">${cards}</ul>
+        </div>
         <div class="slider__controls">
           <button type="button" class="slider__button" data-slide="-1" aria-label="${scope.ui.sliderPrev}">&larr;</button>
           <button type="button" class="slider__button" data-carousel-pause aria-pressed="${carouselPaused}" aria-label="${scope.ui.carouselPause}">
@@ -219,40 +221,46 @@ const CAROUSEL_SPEED = 40; // px per second
 const CAROUSEL_RESUME_MS = 4000; // idle time after a swipe, drag or arrow before it moves again
 let carouselPaused = reducedMotion.matches; // the pause button; starts paused for reduced motion
 
+// Moves the track with a GPU transform (sub-pixel smooth) instead of scrolling it.
 // Listeners live on the static container because the carousel is re-rendered on every switch.
 function initCarousel() {
   const container = document.getElementById("projects-content");
+  let offset = 0; // px the track is shifted left; kept inside the real (middle) set
   let drag = null;
-  let isHovered = false;
+  let glide = null; // arrow-button animation: { from, to, start }
   let isFocused = false;
   let resumeAt = 0;
-  let carry = 0;
   let lastTime = 0;
   let frame = 0;
 
   const getTrack = () => container.querySelector(".slider__track");
   const holdForAWhile = () => (resumeAt = performance.now() + CAROUSEL_RESUME_MS);
 
-  // Distance between a card and its first copy: scrolling by it looks identical, so the loop has no seam
-  function wrap(track) {
-    const period = track.children[track.children.length / Number(track.dataset.sets)].offsetLeft - track.children[0].offsetLeft;
-    if (track.scrollLeft >= period * 2) track.scrollLeft -= period;
-    else if (track.scrollLeft < period) track.scrollLeft += period;
+  // Distance from a card to its copy: shifting by it looks identical, so the loop has no seam
+  function getPeriod(track) {
+    return track.children[Number(track.dataset.periodCards)].offsetLeft - track.children[0].offsetLeft;
+  }
+
+  function render(track) {
+    const period = getPeriod(track);
+    if (!period) return;
+    offset = ((((offset - period) % period) + period) % period) + period; // wrap into [period, 2 * period)
+    track.style.transform = `translate3d(${-offset}px, 0, 0)`;
   }
 
   function tick(time) {
     const track = getTrack();
     const elapsed = lastTime ? Math.min(time - lastTime, 100) : 0;
     lastTime = time;
-    if (track && !carouselPaused && !isHovered && !isFocused && !drag && time > resumeAt) {
-      // scrollLeft only moves in whole pixels, so fractions are carried between frames
-      carry += (CAROUSEL_SPEED * elapsed) / 1000;
-      const whole = Math.floor(carry);
-      if (whole) {
-        track.scrollLeft += whole;
-        carry -= whole;
+    if (track) {
+      if (glide) {
+        const progress = Math.min((time - glide.start) / 450, 1);
+        offset = glide.from + (glide.to - glide.from) * (1 - Math.pow(1 - progress, 3)); // ease-out
+        if (progress === 1) glide = null;
+      } else if (!carouselPaused && !isFocused && !drag && time > resumeAt) {
+        offset += (CAROUSEL_SPEED * elapsed) / 1000;
       }
-      wrap(track);
+      render(track);
     }
     frame = requestAnimationFrame(tick);
   }
@@ -268,12 +276,27 @@ function initCarousel() {
     }
   }).observe(container);
 
-  container.addEventListener("pointermove", (event) => (isHovered = event.pointerType === "mouse" && !!event.target.closest(".slider")));
-  container.addEventListener("pointerleave", () => (isHovered = false));
-  container.addEventListener("focusin", (event) => (isFocused = !!event.target.closest(".slider")));
+  // Keyboard: pause while a card has focus and bring that card into view
+  container.addEventListener("focusin", (event) => {
+    const slide = event.target.closest(".slide");
+    isFocused = !!event.target.closest(".slider");
+    if (!slide) return;
+    const track = getTrack();
+    slide.closest(".slider__viewport").scrollLeft = 0; // focus must not scroll the clipped viewport itself
+    offset = slide.offsetLeft - track.children[0].offsetLeft;
+  });
   container.addEventListener("focusout", () => (isFocused = false));
-  container.addEventListener("wheel", (event) => event.target.closest(".slider") && holdForAWhile(), { passive: true });
-  container.addEventListener("touchstart", (event) => event.target.closest(".slider") && holdForAWhile(), { passive: true });
+  container.addEventListener("scroll", (event) => {
+    if (event.target.classList.contains("slider__viewport")) event.target.scrollLeft = 0;
+  }, true);
+
+  // Sideways trackpad or shift+wheel moves it; plain vertical wheel keeps scrolling the page
+  container.addEventListener("wheel", (event) => {
+    if (!event.target.closest(".slider__viewport") || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    offset += event.deltaX;
+    holdForAWhile();
+  }, { passive: false });
 
   container.addEventListener("click", (event) => {
     const pauseButton = event.target.closest("[data-carousel-pause]");
@@ -284,39 +307,43 @@ function initCarousel() {
     }
     const button = event.target.closest("[data-slide]");
     if (button) {
-      const track = getTrack();
-      wrap(track); // start from the middle set so there is always room in both directions
-      track.scrollBy({ left: Number(button.dataset.slide) * track.querySelector(".slide").offsetWidth, behavior: reducedMotion.matches ? "auto" : "smooth" });
+      const step = getTrack().children[1].offsetLeft - getTrack().children[0].offsetLeft; // one card + gap
+      const to = offset + Number(button.dataset.slide) * step;
+      if (reducedMotion.matches) offset = to;
+      else glide = { from: offset, to, start: performance.now() };
       holdForAWhile();
     }
     // A drag that moved should not open the card underneath
     if (drag && drag.moved) event.preventDefault();
   }, true);
 
-  // Mouse drag; touch and trackpads already scroll natively
+  // Drag with mouse or finger. touch-action: pan-y in CSS leaves vertical swipes to the page.
   container.addEventListener("dragstart", (event) => {
-    if (event.target.closest(".slider__track")) event.preventDefault(); // no native link/image dragging
+    if (event.target.closest(".slider__viewport")) event.preventDefault(); // no native link/image dragging
   });
   container.addEventListener("pointerdown", (event) => {
-    const track = event.target.closest(".slider__track");
-    if (!track || event.pointerType !== "mouse") return;
-    drag = { track, startX: event.clientX, startScroll: track.scrollLeft, moved: false };
+    const viewport = event.target.closest(".slider__viewport");
+    if (!viewport || event.button > 0) return;
+    drag = { viewport, startX: event.clientX, startOffset: offset, moved: false };
+    glide = null;
   });
   window.addEventListener("pointermove", (event) => {
     if (!drag) return;
     const distance = event.clientX - drag.startX;
-    if (Math.abs(distance) > 5) {
+    if (!drag.moved && Math.abs(distance) > 5) {
       drag.moved = true;
-      drag.track.classList.add("is-dragging");
+      drag.viewport.classList.add("is-dragging");
     }
-    drag.track.scrollLeft = drag.startScroll - distance;
+    if (drag.moved) offset = drag.startOffset - distance;
   });
-  window.addEventListener("pointerup", () => {
+  const endDrag = () => {
     if (!drag) return;
-    drag.track.classList.remove("is-dragging");
+    drag.viewport.classList.remove("is-dragging");
     holdForAWhile();
     setTimeout(() => (drag = null)); // keep "moved" until the click that follows pointerup
-  });
+  };
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag); // the browser took over for a vertical swipe
 }
 
 // Header is transparent over the forest scene and solid once the page scrolls past it.
@@ -373,7 +400,7 @@ function updateSwitches() {
 // Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
 const REVEAL_SELECTOR =
   ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
-  ".experience, .tech__group, .featured-card, .projects__subtitle, .slide, .empty-state, " +
+  ".experience, .tech__group, .featured-card, .projects__subtitle, .slider, .empty-state, " +
   ".contact__lead, .contact-list > li";
 
 const revealObserver = new IntersectionObserver(
