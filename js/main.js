@@ -141,7 +141,8 @@ function renderTech(scope) {
     .join("");
 }
 
-function renderCard(project, ui) {
+// isCopy marks the repeated cards that only exist to make the carousel loop seamless.
+function renderCard(project, ui, isCopy) {
   // The logo is decorative: the card title already names the platform.
   const logo = CARD_LOGOS[project.id];
   const media = logo
@@ -149,8 +150,8 @@ function renderCard(project, ui) {
     : `<span class="card__name">${project.name}</span>`;
 
   return `
-    <li class="slide">
-      <a class="card" data-platform="${project.id}" href="${LINKS[project.id].href}" target="_blank" rel="noopener">
+    <li class="slide"${isCopy ? ' aria-hidden="true"' : ""}>
+      <a class="card" data-platform="${project.id}" href="${LINKS[project.id].href}" target="_blank" rel="noopener"${isCopy ? ' tabindex="-1"' : ""}>
         <div class="card__media" aria-hidden="true">${media}</div>
         <div class="card__body">
           <h4 class="card__title">${project.name}</h4>
@@ -165,7 +166,7 @@ function renderCard(project, ui) {
 function renderFeatured(project, ui) {
   const data = FEATURED_PROJECTS[project.id];
   return `
-    <li class="slide slide--featured">
+    <li>
       <article class="featured-card">
         <div class="featured-card__media">
           <img src="${data.image}" alt="${project.imageAlt}" width="${data.width}" height="${data.height}" loading="lazy">
@@ -187,19 +188,23 @@ function renderProjects(scope) {
   const { projects, featured, emptyProjects } = scope.mode;
 
   if (projects) {
-    const slides =
-      featured.map((project) => renderFeatured(project, scope.ui)).join("") +
-      projects.map((project) => renderCard(project, scope.ui)).join("");
+    // Three sets of cards: one real, two copies, so even a wide screen always has room to loop
+    const cards = [false, true, true]
+      .map((isCopy) => projects.map((project) => renderCard(project, scope.ui, isCopy)).join(""))
+      .join("");
     container.innerHTML = `
+      <ul class="featured">${featured.map((project) => renderFeatured(project, scope.ui)).join("")}</ul>
+      <h3 class="projects__subtitle">${scope.mode.profilesTitle}</h3>
       <div class="slider">
-        <ul class="slider__track" tabindex="0" aria-label="${scope.ui.sliderLabel}">${slides}</ul>
+        <ul class="slider__track" tabindex="0" aria-label="${scope.ui.sliderLabel}" data-sets="3">${cards}</ul>
         <div class="slider__controls">
           <button type="button" class="slider__button" data-slide="-1" aria-label="${scope.ui.sliderPrev}">&larr;</button>
-          <div class="slider__progress" aria-hidden="true"><span></span></div>
+          <button type="button" class="slider__button" data-carousel-pause aria-pressed="${carouselPaused}" aria-label="${scope.ui.carouselPause}">
+            <span aria-hidden="true">${carouselPaused ? "&#9654;" : "&#10074;&#10074;"}</span>
+          </button>
           <button type="button" class="slider__button" data-slide="1" aria-label="${scope.ui.sliderNext}">&rarr;</button>
         </div>
       </div>`;
-    updateSlider(container.querySelector(".slider__track"));
     return;
   }
   container.innerHTML = `
@@ -209,34 +214,83 @@ function renderProjects(scope) {
     </div>`;
 }
 
-// Progress bar and arrow states follow the scroll position of the track.
-function updateSlider(track) {
-  const slider = track.closest(".slider");
-  const maxScroll = track.scrollWidth - track.clientWidth;
-  const progress = maxScroll > 0 ? (track.scrollLeft + track.clientWidth) / track.scrollWidth : 1;
-  slider.style.setProperty("--progress", `${Math.round(progress * 100)}%`);
-  slider.querySelector('[data-slide="-1"]').disabled = track.scrollLeft <= 1;
-  slider.querySelector('[data-slide="1"]').disabled = track.scrollLeft >= maxScroll - 1;
-}
+// Profiles carousel: drifts on its own in an endless loop and stops while someone uses it.
+const CAROUSEL_SPEED = 40; // px per second
+const CAROUSEL_RESUME_MS = 4000; // idle time after a swipe, drag or arrow before it moves again
+let carouselPaused = reducedMotion.matches; // the pause button; starts paused for reduced motion
 
-// Listeners live on the static container because the slider is re-rendered on every switch.
-function initSlider() {
+// Listeners live on the static container because the carousel is re-rendered on every switch.
+function initCarousel() {
   const container = document.getElementById("projects-content");
   let drag = null;
+  let isHovered = false;
+  let isFocused = false;
+  let resumeAt = 0;
+  let carry = 0;
+  let lastTime = 0;
+  let frame = 0;
+
+  const getTrack = () => container.querySelector(".slider__track");
+  const holdForAWhile = () => (resumeAt = performance.now() + CAROUSEL_RESUME_MS);
+
+  // Distance between a card and its first copy: scrolling by it looks identical, so the loop has no seam
+  function wrap(track) {
+    const period = track.children[track.children.length / Number(track.dataset.sets)].offsetLeft - track.children[0].offsetLeft;
+    if (track.scrollLeft >= period * 2) track.scrollLeft -= period;
+    else if (track.scrollLeft < period) track.scrollLeft += period;
+  }
+
+  function tick(time) {
+    const track = getTrack();
+    const elapsed = lastTime ? Math.min(time - lastTime, 100) : 0;
+    lastTime = time;
+    if (track && !carouselPaused && !isHovered && !isFocused && !drag && time > resumeAt) {
+      // scrollLeft only moves in whole pixels, so fractions are carried between frames
+      carry += (CAROUSEL_SPEED * elapsed) / 1000;
+      const whole = Math.floor(carry);
+      if (whole) {
+        track.scrollLeft += whole;
+        carry -= whole;
+      }
+      wrap(track);
+    }
+    frame = requestAnimationFrame(tick);
+  }
+
+  // Only run while the projects are on screen
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && !frame) {
+      lastTime = 0;
+      frame = requestAnimationFrame(tick);
+    } else if (!entry.isIntersecting && frame) {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    }
+  }).observe(container);
+
+  container.addEventListener("pointermove", (event) => (isHovered = event.pointerType === "mouse" && !!event.target.closest(".slider")));
+  container.addEventListener("pointerleave", () => (isHovered = false));
+  container.addEventListener("focusin", (event) => (isFocused = !!event.target.closest(".slider")));
+  container.addEventListener("focusout", () => (isFocused = false));
+  container.addEventListener("wheel", (event) => event.target.closest(".slider") && holdForAWhile(), { passive: true });
+  container.addEventListener("touchstart", (event) => event.target.closest(".slider") && holdForAWhile(), { passive: true });
 
   container.addEventListener("click", (event) => {
+    const pauseButton = event.target.closest("[data-carousel-pause]");
+    if (pauseButton) {
+      carouselPaused = !carouselPaused;
+      pauseButton.setAttribute("aria-pressed", String(carouselPaused));
+      pauseButton.firstElementChild.innerHTML = carouselPaused ? "&#9654;" : "&#10074;&#10074;";
+    }
     const button = event.target.closest("[data-slide]");
     if (button) {
-      const track = container.querySelector(".slider__track");
-      const step = track.querySelector(".slide").offsetWidth;
-      track.scrollBy({ left: Number(button.dataset.slide) * step, behavior: reducedMotion.matches ? "auto" : "smooth" });
+      const track = getTrack();
+      wrap(track); // start from the middle set so there is always room in both directions
+      track.scrollBy({ left: Number(button.dataset.slide) * track.querySelector(".slide").offsetWidth, behavior: reducedMotion.matches ? "auto" : "smooth" });
+      holdForAWhile();
     }
     // A drag that moved should not open the card underneath
     if (drag && drag.moved) event.preventDefault();
-  }, true);
-
-  container.addEventListener("scroll", (event) => {
-    if (event.target.classList.contains("slider__track")) updateSlider(event.target);
   }, true);
 
   // Mouse drag; touch and trackpads already scroll natively
@@ -259,7 +313,8 @@ function initSlider() {
   });
   window.addEventListener("pointerup", () => {
     if (!drag) return;
-    drag.track.classList.remove("is-dragging"); // snap takes over again and settles on a slide
+    drag.track.classList.remove("is-dragging");
+    holdForAWhile();
     setTimeout(() => (drag = null)); // keep "moved" until the click that follows pointerup
   });
 }
@@ -318,7 +373,7 @@ function updateSwitches() {
 // Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
 const REVEAL_SELECTOR =
   ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
-  ".experience, .tech__group, .slide, .empty-state, " +
+  ".experience, .tech__group, .featured-card, .projects__subtitle, .slide, .empty-state, " +
   ".contact__lead, .contact-list > li";
 
 const revealObserver = new IntersectionObserver(
@@ -396,7 +451,7 @@ document.querySelectorAll("[data-set-lang]").forEach((button) => {
 });
 
 document.getElementById("year").textContent = new Date().getFullYear();
-initSlider();
+initCarousel();
 initHeader();
 renderPage();
 syncUrl();

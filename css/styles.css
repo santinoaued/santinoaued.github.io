@@ -577,18 +577,21 @@ main.is-switching {
   }
 }
 
-/* ---------- Projects slider ---------- */
+/* ---------- Profiles carousel ---------- */
 
-/* Native horizontal scroll with snap: touch and trackpads work for free,
-   main.js adds mouse drag and the arrow buttons */
+.projects__subtitle {
+  margin: var(--space-8) 0 var(--space-4);
+  font-size: var(--text-lg);
+}
+
+/* Native horizontal scroll (no snap, so main.js can drift it continuously);
+   touch and trackpads work for free, main.js adds mouse drag and the buttons */
 .slider__track {
   display: flex;
   gap: var(--space-5);
   margin: 0 calc(-1 * var(--gutter));
   padding: var(--space-2) var(--gutter) var(--space-5);
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--gutter);
   overscroll-behavior-x: contain;
   list-style: none;
   scrollbar-width: none;
@@ -600,7 +603,6 @@ main.is-switching {
 }
 
 .slider__track.is-dragging {
-  scroll-snap-type: none;
   cursor: grabbing;
   user-select: none;
 }
@@ -611,11 +613,6 @@ main.is-switching {
 
 .slide {
   flex: 0 0 clamp(16rem, 78vw, 21rem);
-  scroll-snap-align: start;
-}
-
-.slide--featured {
-  flex-basis: clamp(16rem, 86vw, 34rem);
 }
 
 .slider__controls {
@@ -639,33 +636,18 @@ main.is-switching {
   transition: background-color var(--duration) var(--ease), color var(--duration) var(--ease), opacity var(--duration) var(--ease);
 }
 
-.slider__button:hover:not(:disabled) {
+.slider__button:hover {
   color: var(--color-linen-light);
   background: var(--accent);
 }
 
-.slider__button:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-
-.slider__progress {
-  flex: 1;
-  height: 2px;
-  overflow: hidden;
-  background: var(--color-line);
-  border-radius: var(--radius-pill);
-}
-
-.slider__progress span {
-  display: block;
-  width: var(--progress, 0%);
-  height: 100%;
-  background: var(--accent);
-  transition: width 200ms var(--ease);
-}
-
 /* ---------- Featured project ---------- */
+
+.featured {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
 .featured-card {
   display: flex;
@@ -718,6 +700,23 @@ main.is-switching {
 .featured-card__text {
   max-width: 44ch;
   color: var(--color-muted);
+}
+
+/* Wide screens: cover on the left, text on the right */
+@media (min-width: 48rem) {
+  .featured-card {
+    flex-direction: row;
+  }
+
+  .featured-card__media {
+    flex: 1.15;
+    aspect-ratio: 677 / 602;
+  }
+
+  .featured-card__body {
+    justify-content: center;
+    padding: var(--space-7);
+  }
 }
 
 /* ---------- Project cards ---------- */

@@ -47,7 +47,8 @@ const CONTENT = {
       modeWeb: "Web Dev",
       langSwitchLabel: "Elegir idioma",
       newTab: "(se abre en otra pestaña)",
-      sliderLabel: "Proyectos y perfiles",
+      sliderLabel: "Mis perfiles",
+      carouselPause: "Pausar el carrusel",
       sliderPrev: "Anterior",
       sliderNext: "Siguiente",
       whatsappButton: "Escribime",
@@ -103,6 +104,7 @@ const CONTENT = {
         { title: "Gestión y producción", items: ["Notion", "GitHub", "Trello"] },
       ],
       projectsLead: "Mis juegos, mi código y mi recorrido, cada cosa en su lugar.",
+      profilesTitle: "Dónde encontrar más de mi trabajo",
       featured: [
         {
           id: "resurge",
@@ -172,7 +174,8 @@ const CONTENT = {
       modeWeb: "Web Dev",
       langSwitchLabel: "Choose language",
       newTab: "(opens in a new tab)",
-      sliderLabel: "Projects and profiles",
+      sliderLabel: "My profiles",
+      carouselPause: "Pause the carousel",
       sliderPrev: "Previous",
       sliderNext: "Next",
       whatsappButton: "Message me",
@@ -228,6 +231,7 @@ const CONTENT = {
         { title: "Management and production", items: ["Notion", "GitHub", "Trello"] },
       ],
       projectsLead: "My games, my code and my background, each in its own place.",
+      profilesTitle: "Where to find more of my work",
       featured: [
         {
           id: "resurge",
