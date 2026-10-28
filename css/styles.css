@@ -64,12 +64,6 @@
   --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-:root[data-mode="web"] {
-  --accent: var(--color-earth);
-  --accent-strong: var(--color-earth-deep);
-  --accent-on-dark: var(--color-wood);
-}
-
 /* ---------- Base ---------- */
 
 *,
@@ -802,25 +796,6 @@ main.is-switching {
 
 .card:hover .card__arrow {
   transform: translateX(3px);
-}
-
-/* ---------- Empty projects (web mode) ---------- */
-
-.empty-state {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-5);
-  max-width: 44rem;
-  padding: var(--space-7) var(--space-6);
-  background: var(--color-linen-light);
-  border: 1.5px dashed var(--color-wood);
-  border-radius: var(--radius-md);
-}
-
-.empty-state__text {
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  line-height: 1.45;
 }
 
 /* ---------- Contact ---------- */

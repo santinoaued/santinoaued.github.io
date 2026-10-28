@@ -1,7 +1,8 @@
-// Mode and language switches, URL/localStorage sync, and rendering of all
+// Language switch, URL/localStorage sync, and rendering of all
 // visible text from content.js.
 
-const MODES = ["game", "web"];
+// shortcut: only the game profile exists for now; add modes back here (and a switch in index.html) when the web side returns
+const MODES = ["game"];
 const LANGUAGES = ["es", "en"];
 const DEFAULT_STATE = { mode: "game", lang: "es" };
 const STORAGE_KEY = "santino-portfolio";
@@ -185,34 +186,26 @@ function renderFeatured(project, ui) {
 
 function renderProjects(scope) {
   const container = document.getElementById("projects-content");
-  const { projects, featured, emptyProjects } = scope.mode;
+  const { projects, featured } = scope.mode;
 
-  if (projects) {
-    // Real cards in the middle, a copy on each side, so the loop never shows an edge
-    const cards = [true, false, true]
-      .map((isCopy) => projects.map((project) => renderCard(project, scope.ui, isCopy)).join(""))
-      .join("");
-    container.innerHTML = `
-      <ul class="featured">${featured.map((project) => renderFeatured(project, scope.ui)).join("")}</ul>
-      <h3 class="projects__subtitle">${scope.mode.profilesTitle}</h3>
-      <div class="slider">
-        <div class="slider__viewport">
-          <ul class="slider__track" aria-label="${scope.ui.sliderLabel}" data-period-cards="${projects.length}">${cards}</ul>
-        </div>
-        <div class="slider__controls">
-          <button type="button" class="slider__button" data-slide="-1" aria-label="${scope.ui.sliderPrev}">&larr;</button>
-          <button type="button" class="slider__button" data-carousel-pause aria-pressed="${carouselPaused}" aria-label="${scope.ui.carouselPause}">
-            <span aria-hidden="true">${carouselPaused ? "&#9654;" : "&#10074;&#10074;"}</span>
-          </button>
-          <button type="button" class="slider__button" data-slide="1" aria-label="${scope.ui.sliderNext}">&rarr;</button>
-        </div>
-      </div>`;
-    return;
-  }
+  // Real cards in the middle, a copy on each side, so the loop never shows an edge
+  const cards = [true, false, true]
+    .map((isCopy) => projects.map((project) => renderCard(project, scope.ui, isCopy)).join(""))
+    .join("");
   container.innerHTML = `
-    <div class="empty-state">
-      <p class="empty-state__text">${emptyProjects.text}</p>
-      <a class="button button--primary" href="#contact">${emptyProjects.cta}</a>
+    <ul class="featured">${featured.map((project) => renderFeatured(project, scope.ui)).join("")}</ul>
+    <h3 class="projects__subtitle">${scope.mode.profilesTitle}</h3>
+    <div class="slider">
+      <div class="slider__viewport">
+        <ul class="slider__track" aria-label="${scope.ui.sliderLabel}" data-period-cards="${projects.length}">${cards}</ul>
+      </div>
+      <div class="slider__controls">
+        <button type="button" class="slider__button" data-slide="-1" aria-label="${scope.ui.sliderPrev}">&larr;</button>
+        <button type="button" class="slider__button" data-carousel-pause aria-pressed="${carouselPaused}" aria-label="${scope.ui.carouselPause}">
+          <span aria-hidden="true">${carouselPaused ? "&#9654;" : "&#10074;&#10074;"}</span>
+        </button>
+        <button type="button" class="slider__button" data-slide="1" aria-label="${scope.ui.sliderNext}">&rarr;</button>
+      </div>
     </div>`;
 }
 
@@ -389,9 +382,6 @@ function renderWhatsappButton(scope) {
 }
 
 function updateSwitches() {
-  document.querySelectorAll("[data-set-mode]").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.setMode === state.mode));
-  });
   document.querySelectorAll("[data-set-lang]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.setLang === state.lang));
   });
@@ -400,7 +390,7 @@ function updateSwitches() {
 // Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
 const REVEAL_SELECTOR =
   ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
-  ".experience, .tech__group, .featured-card, .projects__subtitle, .slider, .empty-state, " +
+  ".experience, .tech__group, .featured-card, .projects__subtitle, .slider, " +
   ".contact__lead, .contact-list > li";
 
 const revealObserver = new IntersectionObserver(
@@ -470,9 +460,6 @@ function renderPage() {
 
 // ---------- Init ----------
 
-document.querySelectorAll("[data-set-mode]").forEach((button) => {
-  button.addEventListener("click", () => setState({ mode: button.dataset.setMode }));
-});
 document.querySelectorAll("[data-set-lang]").forEach((button) => {
   button.addEventListener("click", () => setState({ lang: button.dataset.setLang }));
 });

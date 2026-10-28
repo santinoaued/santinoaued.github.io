@@ -1,8 +1,8 @@
 // All visible text and link data for the site.
 // CONTENT is split by language; inside each one:
 //   ui     -> controls and accessibility labels
-//   common -> text shared by both modes
-//   game / web -> text that changes with the selected mode
+//   common -> general text
+//   game   -> hero, technologies, projects and contact text (the only mode for now)
 
 // icon: small mark for the contact list (null = no icon yet).
 const LINKS = {
@@ -14,10 +14,9 @@ const LINKS = {
   itch: { href: "https://santino-aued.itch.io/", display: "santino-aued.itch.io", icon: "assets/img/icon-itch.png" },
 };
 
-// Contact links shown in each mode, in order.
+// Contact links shown in the contact section, in order.
 const MODE_CONTACTS = {
   game: ["email", "linkedin", "github", "itch"],
-  web: ["whatsapp", "email", "instagram", "linkedin"],
 };
 
 // Platform logos shown on the project cards (light, transparent PNGs).
@@ -42,9 +41,6 @@ const CONTENT = {
   es: {
     ui: {
       skipLink: "Saltar al contenido",
-      modeSwitchLabel: "Elegir perfil: videojuegos o web",
-      modeGame: "Game Dev",
-      modeWeb: "Web Dev",
       langSwitchLabel: "Elegir idioma",
       newTab: "(se abre en otra pestaña)",
       sliderLabel: "Mis perfiles",
@@ -138,40 +134,11 @@ const CONTENT = {
       contactLead:
         "Si estás armando un equipo, organizando una jam o querés charlar de un proyecto, escribime.",
     },
-    web: {
-      metaTitle: "Santino Aued · Web Developer",
-      metaDescription:
-        "Santino Aued, Web Developer. Sitios web para comercios y emprendimientos en Entre Ríos y Buenos Aires.",
-      heroTitle: "Web Developer",
-      heroLead:
-        "Sitios web para comercios y emprendimientos. Formándome como Full Stack con freeCodeCamp.",
-      heroActions: [
-        { label: "Hablemos de tu sitio", href: "#contact" },
-        { label: "Sobre mí", href: "#about" },
-      ],
-      techGroups: [
-        {
-          title: "Desarrollo web",
-          items: ["HTML", "CSS", "JavaScript", "Git y GitHub", "Vercel"],
-        },
-        { title: "Organización", items: ["Notion", "Trello"] },
-      ],
-      projectsLead: "",
-      emptyProjects: {
-        text: "Mis primeros proyectos web están en camino. Si tenés un comercio o emprendimiento y querés tu sitio, escribime.",
-        cta: "Escribime",
-      },
-      contactLead:
-        "Contame qué hace tu comercio o emprendimiento y qué necesitás. Por WhatsApp te respondo más rápido.",
-    },
   },
 
   en: {
     ui: {
       skipLink: "Skip to content",
-      modeSwitchLabel: "Choose profile: games or web",
-      modeGame: "Game Dev",
-      modeWeb: "Web Dev",
       langSwitchLabel: "Choose language",
       newTab: "(opens in a new tab)",
       sliderLabel: "My profiles",
@@ -264,32 +231,6 @@ const CONTENT = {
       ],
       contactLead:
         "If you're building a team, running a jam or want to talk about a project, get in touch.",
-    },
-    web: {
-      metaTitle: "Santino Aued · Web Developer",
-      metaDescription:
-        "Santino Aued, Web Developer. Websites for local businesses and entrepreneurs in Argentina.",
-      heroTitle: "Web Developer",
-      heroLead:
-        "Websites for local businesses and entrepreneurs. Currently training as a Full Stack developer with freeCodeCamp.",
-      heroActions: [
-        { label: "Let's talk about your site", href: "#contact" },
-        { label: "About me", href: "#about" },
-      ],
-      techGroups: [
-        {
-          title: "Web development",
-          items: ["HTML", "CSS", "JavaScript", "Git & GitHub", "Vercel"],
-        },
-        { title: "Organization", items: ["Notion", "Trello"] },
-      ],
-      projectsLead: "",
-      emptyProjects: {
-        text: "My first web projects are on the way. If you run a business and need a website, get in touch.",
-        cta: "Get in touch",
-      },
-      contactLead:
-        "Tell me about your business and what you need. WhatsApp is the fastest way to reach me.",
     },
   },
 };
