@@ -1,6 +1,14 @@
 /* ---------- Tokens ---------- */
 
 :root {
+  /* raudo estudio palette ("Brote", from its brand brief), used only in its tab */
+  --color-raudo-green: #12372A;
+  --color-raudo-cream: #FBF6EC;
+  --color-raudo-mustard: #F2B705;
+  --color-raudo-mustard-dark: #DCA603;
+  --color-raudo-sand: #E6DCC8;
+  --color-raudo-gray-green: #4A5D53;
+
   /* Palette */
   --color-forest: #1F3A2E;
   --color-forest-deep: #172C23;
@@ -221,6 +229,7 @@ main.is-switching {
 .site-header__controls {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
 }
 
@@ -913,6 +922,215 @@ main.is-switching {
 .whatsapp-button__icon {
   width: 1.375rem;
   height: 1.375rem;
+}
+
+/* ---------- Header tabs ---------- */
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+
+.tabs__tab:hover,
+.tabs__tab[aria-current="page"] {
+  color: var(--color-charcoal);
+}
+
+.tabs__tab[aria-current="page"] {
+  border-bottom-color: var(--accent);
+}
+
+.site-header.is-over-hero .tabs__tab {
+  color: var(--color-linen-muted);
+}
+
+.site-header.is-over-hero .tabs__tab:hover,
+.site-header.is-over-hero .tabs__tab[aria-current="page"] {
+  color: var(--color-linen-light);
+  border-bottom-color: var(--accent-on-dark);
+}
+
+/* ---------- raudo estudio tab ---------- */
+
+.raudo {
+  --accent: var(--color-raudo-green);
+  color: var(--color-raudo-green);
+  background: var(--color-raudo-cream);
+}
+
+.raudo-hero {
+  /* Room for the fixed header */
+  padding-block: 8rem var(--space-8);
+  color: var(--color-raudo-cream);
+  background: var(--color-raudo-green);
+}
+
+.raudo-hero__inner,
+.raudo-closing__inner {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-5);
+}
+
+.raudo-hero__logo {
+  width: clamp(10rem, 32vw, 15rem);
+  height: auto;
+  margin-bottom: var(--space-4);
+}
+
+.raudo-hero__title {
+  max-width: 18ch;
+  font-size: clamp(2.25rem, 1.6rem + 3vw, 3.5rem);
+}
+
+.raudo-hero__lead {
+  max-width: 52ch;
+  font-size: var(--text-lg);
+  color: var(--color-raudo-sand);
+}
+
+/* The one loud element of the tab: mustard is the brand's accent for buttons */
+.raudo-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.5rem;
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-7);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-raudo-green);
+  text-decoration: none;
+  background: var(--color-raudo-mustard);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--duration) var(--ease), transform var(--duration) var(--ease);
+}
+
+.raudo-button:hover {
+  background: var(--color-raudo-mustard-dark);
+  transform: translateY(-2px);
+}
+
+.raudo-hero .raudo-button:focus-visible,
+.raudo-closing .raudo-button:focus-visible {
+  outline-color: var(--color-raudo-cream);
+}
+
+.raudo-services {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.raudo-service {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-linen-light);
+  border: 1px solid var(--color-raudo-sand);
+  border-radius: 16px;
+}
+
+.raudo-service__title {
+  font-size: var(--text-card-title);
+}
+
+.raudo-service__text,
+.raudo-step p {
+  color: var(--color-raudo-gray-green);
+}
+
+.raudo .tag {
+  background: var(--color-raudo-cream);
+  border-color: var(--color-raudo-sand);
+}
+
+/* Mustard marker behind the key phrase, as in the brand brief */
+.raudo-service__time {
+  justify-self: start;
+  margin-top: var(--space-2);
+  padding-inline: var(--space-1);
+  background: linear-gradient(transparent 55%, var(--color-raudo-mustard) 55%);
+}
+
+.raudo-band {
+  color: var(--color-raudo-cream);
+  background: var(--color-raudo-green);
+}
+
+.raudo-role {
+  max-width: 60ch;
+  font-size: var(--text-lg);
+  color: var(--color-raudo-sand);
+}
+
+.raudo-steps {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.raudo-step {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-5);
+  border-top: 2px solid var(--color-raudo-sand);
+  counter-increment: step;
+}
+
+/* Numbered because it really is a sequence */
+.raudo-step::before {
+  content: counter(step);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+
+.raudo-step__title {
+  font-size: var(--text-lg);
+}
+
+.raudo-closing {
+  padding-block: var(--space-8);
+  color: var(--color-raudo-cream);
+  background: var(--color-raudo-green);
+}
+
+.raudo-closing__title {
+  font-size: var(--text-xl);
+}
+
+.raudo-closing__text {
+  max-width: 50ch;
+  color: var(--color-raudo-sand);
+}
+
+@media (min-width: 48rem) {
+  .raudo-services {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .raudo-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* ---------- Intro ---------- */

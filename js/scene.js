@@ -205,8 +205,9 @@ function startHeroScene() {
     frameRequest = isVisible ? requestAnimationFrame(loop) : 0;
   }
 
+  // Watches the hero itself, not the window: it also fires when the hero is shown after starting on another tab
   resize();
-  window.addEventListener("resize", resize);
+  new ResizeObserver(resize).observe(hero);
   if (!isAnimated) return;
 
   window.addEventListener("pointermove", (event) => {

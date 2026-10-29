@@ -41,6 +41,9 @@ const CONTENT = {
   es: {
     ui: {
       skipLink: "Saltar al contenido",
+      tabsLabel: "Secciones del sitio",
+      tabAbout: "Sobre mí",
+      tabRaudo: "raudo estudio",
       langSwitchLabel: "Elegir idioma",
       newTab: "(se abre en otra pestaña)",
       sliderLabel: "Mis perfiles",
@@ -134,11 +137,49 @@ const CONTENT = {
       contactLead:
         "Si estás armando un equipo, organizando una jam o querés charlar de un proyecto, escribime.",
     },
+    raudo: {
+      metaTitle: "Santino Aued · raudo estudio",
+      metaDescription:
+        "raudo estudio, la agencia de desarrollo web de Santino Aued y Lautaro Togni: landing pages y sistemas a medida para comercios de zona norte y CABA.",
+      title: "Mi agencia de desarrollo web",
+      lead: "Con Lautaro Togni armamos landing pages y sistemas a medida para comercios y emprendimientos de zona norte y CABA. Los ponemos en marcha rápido y no les soltamos la mano.",
+      cta: "Visitar raudoestudio.com",
+      logoAlt: "raudo estudio",
+      servicesTitle: "Qué hacemos",
+      services: [
+        {
+          title: "Landing page",
+          text: "Para darse a conocer y aparecer en Google: una web con WhatsApp, ubicación y servicios.",
+          tags: ["WhatsApp", "Ubicación", "SEO"],
+          time: "Andando en días",
+        },
+        {
+          title: "Sistema a medida",
+          text: "Para dejar el cuaderno, el Excel que nadie actualiza o los pedidos perdidos entre chats.",
+          tags: ["Turnos", "Pedidos", "Stock", "Clientes"],
+          time: "Andando en 1 a 2 semanas",
+        },
+      ],
+      roleTitle: "Mi parte",
+      roleText:
+        "Me encargo del diseño y el desarrollo web: que cada sitio se vea bien, se entienda en cinco segundos y aparezca en Google. Lautaro arma lo que no se ve: los turnos, pedidos y stock que funcionan solos mientras el negocio atiende. Entre los dos diseñamos, programamos y mantenemos cada proyecto de punta a punta.",
+      stepsTitle: "Cómo trabajamos",
+      steps: [
+        { title: "Charlamos", text: "El cliente nos cuenta cómo funciona su negocio. La primera charla no tiene cargo." },
+        { title: "Andando en días", text: "En pocos días tiene algo funcionando para probar." },
+        { title: "No le soltamos la mano", text: "Mantenemos la web y le sumamos lo que haga falta, cuando lo necesite." },
+      ],
+      closingTitle: "¿Tenés un negocio que quiere ordenarse?",
+      closingText: "En raudoestudio.com están los servicios, los precios y el WhatsApp para arrancar.",
+    },
   },
 
   en: {
     ui: {
       skipLink: "Skip to content",
+      tabsLabel: "Site sections",
+      tabAbout: "About me",
+      tabRaudo: "raudo estudio",
       langSwitchLabel: "Choose language",
       newTab: "(opens in a new tab)",
       sliderLabel: "My profiles",
@@ -231,6 +272,41 @@ const CONTENT = {
       ],
       contactLead:
         "If you're building a team, running a jam or want to talk about a project, get in touch.",
+    },
+    raudo: {
+      metaTitle: "Santino Aued · raudo estudio",
+      metaDescription:
+        "raudo estudio, the web development studio of Santino Aued and Lautaro Togni: landing pages and custom systems for local businesses in Buenos Aires.",
+      title: "My web development studio",
+      lead: "With Lautaro Togni I build landing pages and custom systems for local businesses and entrepreneurs in Buenos Aires. We get them up and running fast and stay by their side.",
+      cta: "Visit raudoestudio.com",
+      logoAlt: "raudo estudio",
+      servicesTitle: "What we do",
+      services: [
+        {
+          title: "Landing page",
+          text: "To get known and show up on Google: a site with WhatsApp, location and services.",
+          tags: ["WhatsApp", "Location", "SEO"],
+          time: "Live in days",
+        },
+        {
+          title: "Custom system",
+          text: "To leave behind the notebook, the spreadsheet nobody updates or orders lost in chats.",
+          tags: ["Bookings", "Orders", "Stock", "Clients"],
+          time: "Live in 1 to 2 weeks",
+        },
+      ],
+      roleTitle: "My part",
+      roleText:
+        "I handle web design and development: making every site look good, make sense in five seconds and show up on Google. Lautaro builds what you don't see: the bookings, orders and stock that run on their own while the business serves its customers. Together we design, build and maintain every project end to end.",
+      stepsTitle: "How we work",
+      steps: [
+        { title: "We talk", text: "The client tells us how their business works. The first call is free." },
+        { title: "Live in days", text: "Within a few days they have something working to try." },
+        { title: "We stay by their side", text: "We maintain the site and add whatever it needs, when it needs it." },
+      ],
+      closingTitle: "Have a business that needs some order?",
+      closingText: "raudoestudio.com has the services, the prices and the WhatsApp link to get started.",
     },
   },
 };

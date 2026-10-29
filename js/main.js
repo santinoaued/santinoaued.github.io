@@ -4,7 +4,8 @@
 // shortcut: only the game profile exists for now; add modes back here (and a switch in index.html) when the web side returns
 const MODES = ["game"];
 const LANGUAGES = ["es", "en"];
-const DEFAULT_STATE = { mode: "game", lang: "es" };
+const VIEWS = ["about", "raudo"]; // header tabs: the portfolio and Raudo Estudio
+const DEFAULT_STATE = { mode: "game", lang: "es", view: "about" };
 const STORAGE_KEY = "santino-portfolio";
 const SWITCH_FADE_MS = 150;
 
@@ -24,6 +25,7 @@ function readUrlState() {
   return {
     mode: pickValid(params.get("mode"), MODES),
     lang: pickValid(params.get("lang"), LANGUAGES),
+    view: pickValid(params.get("view"), VIEWS),
   };
 }
 
@@ -40,18 +42,20 @@ function readStoredState() {
 }
 
 // URL wins over the stored choice; defaults fill whatever is missing.
+// The view comes only from the URL, so a returning visitor always lands on the portfolio.
 function getInitialState() {
   const fromUrl = readUrlState();
   const fromStorage = readStoredState();
   return {
     mode: fromUrl.mode || fromStorage.mode || DEFAULT_STATE.mode,
     lang: fromUrl.lang || fromStorage.lang || DEFAULT_STATE.lang,
+    view: fromUrl.view || DEFAULT_STATE.view,
   };
 }
 
 function saveState() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode: state.mode, lang: state.lang }));
   } catch (error) {
     // Storage blocked (private mode, disabled cookies): the URL still keeps the state.
   }
@@ -61,6 +65,8 @@ function syncUrl() {
   const url = new URL(window.location.href);
   url.searchParams.set("mode", state.mode);
   url.searchParams.set("lang", state.lang);
+  if (state.view === DEFAULT_STATE.view) url.searchParams.delete("view");
+  else url.searchParams.set("view", state.view);
   try {
     history.replaceState(null, "", url);
   } catch (error) {
@@ -70,8 +76,9 @@ function syncUrl() {
 
 function setState(changes) {
   const next = { ...state, ...changes };
-  if (next.mode === state.mode && next.lang === state.lang) return;
+  if (next.mode === state.mode && next.lang === state.lang && next.view === state.view) return;
 
+  const isNewView = next.view !== state.view;
   Object.assign(state, next);
   updateSwitches();
   syncUrl();
@@ -79,11 +86,13 @@ function setState(changes) {
 
   if (reducedMotion.matches) {
     renderPage();
+    if (isNewView) window.scrollTo(0, 0);
     return;
   }
   mainElement.classList.add("is-switching");
   window.setTimeout(() => {
     renderPage();
+    if (isNewView) window.scrollTo({ top: 0, behavior: "instant" }); // a new tab starts at its top
     mainElement.classList.remove("is-switching");
   }, SWITCH_FADE_MS);
 }
@@ -92,7 +101,7 @@ function setState(changes) {
 
 function getTextScope() {
   const text = CONTENT[state.lang];
-  return { ui: text.ui, common: text.common, mode: text[state.mode] };
+  return { ui: text.ui, common: text.common, mode: text[state.mode], raudo: text.raudo };
 }
 
 // Turns "common.aboutTitle" into scope.common.aboutTitle.
@@ -385,12 +394,34 @@ function updateSwitches() {
   document.querySelectorAll("[data-set-lang]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.setLang === state.lang));
   });
+  document.querySelectorAll("[data-set-view]").forEach((tab) => {
+    if (tab.dataset.setView === state.view) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
+  });
+}
+
+// Raudo Estudio tab: services and the steps of how they work.
+function renderRaudo(scope) {
+  document.getElementById("raudo-services").innerHTML = scope.raudo.services
+    .map(
+      (service) => `
+        <li class="raudo-service">
+          <h3 class="raudo-service__title">${service.title}</h3>
+          <p class="raudo-service__text">${service.text}</p>
+          <ul class="tags">${service.tags.map((tag) => `<li class="tag">${tag}</li>`).join("")}</ul>
+          <p class="raudo-service__time">${service.time}</p>
+        </li>`
+    )
+    .join("");
+  document.getElementById("raudo-steps").innerHTML = scope.raudo.steps
+    .map((step) => `<li class="raudo-step"><h3 class="raudo-step__title">${step.title}</h3><p>${step.text}</p></li>`)
+    .join("");
 }
 
 // Scroll "pop": elements appear when they enter the viewport and fade out when they leave it.
 const REVEAL_SELECTOR =
   ".section__title, .section__lead, .about__photo, .about__text, .about__subtitle, .principles li, " +
-  ".experience, .tech__group, .featured-card, .projects__subtitle, .slider, " +
+  ".experience, .tech__group, .featured-card, .projects__subtitle, .slider, .raudo-service, .raudo-role, .raudo-step, " +
   ".contact__lead, .contact-list > li";
 
 const revealObserver = new IntersectionObserver(
@@ -443,8 +474,10 @@ function renderPage() {
 
   root.lang = state.lang;
   root.dataset.mode = state.mode;
-  document.title = scope.mode.metaTitle;
-  document.querySelector('meta[name="description"]').setAttribute("content", scope.mode.metaDescription);
+  const page = state.view === "raudo" ? scope.raudo : scope.mode;
+  document.title = page.metaTitle;
+  document.querySelector('meta[name="description"]').setAttribute("content", page.metaDescription);
+  document.querySelectorAll("[data-view]").forEach((view) => (view.hidden = view.dataset.view !== state.view));
 
   renderTextNodes(scope);
   typeHeroRole(scope);
@@ -454,6 +487,7 @@ function renderPage() {
   renderProjects(scope);
   renderContact(scope);
   renderWhatsappButton(scope);
+  renderRaudo(scope);
   updateSwitches();
   observeReveals();
 }
@@ -462,6 +496,14 @@ function renderPage() {
 
 document.querySelectorAll("[data-set-lang]").forEach((button) => {
   button.addEventListener("click", () => setState({ lang: button.dataset.setLang }));
+});
+document.querySelectorAll("[data-set-view]").forEach((tab) => {
+  tab.addEventListener("click", (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) return; // let "open in new tab" work
+    event.preventDefault(); // the href only matters without JS or when opened in a new tab
+    if (tab.dataset.setView === state.view) window.scrollTo({ top: 0, behavior: reducedMotion.matches ? "auto" : "smooth" });
+    else setState({ view: tab.dataset.setView });
+  });
 });
 
 document.getElementById("year").textContent = new Date().getFullYear();
