@@ -65,7 +65,7 @@ const CONTENT = {
     common: {
       location: "Entre Ríos / Ciudad Autónoma de Buenos Aires",
       aboutTitle: "Sobre mí",
-      photoAlt: "Retrato de Santino Aued con una campera de corderoy marrón",
+      photoAlt: "Retrato de Santino Aued con una remera polo a rayas azules",
       about:
         "Soy Santino Aued, estudio la Tecnicatura Universitaria en Desarrollo y Producción de Videojuegos en la UTN. Antes de dedicarme al desarrollo estudié un año marketing, y de ahí me quedó algo que sigo usando: pensar primero en la persona que va a usar lo que hago.",
       aboutPassion: "Me apasiona gestionar y crear sistemas complejos de forma limpia y escalable.",
@@ -201,7 +201,7 @@ const CONTENT = {
     common: {
       location: "Entre Ríos / Buenos Aires City, Argentina",
       aboutTitle: "About me",
-      photoAlt: "Portrait of Santino Aued wearing a brown corduroy jacket",
+      photoAlt: "Portrait of Santino Aued wearing a blue striped polo shirt",
       about:
         "I'm Santino Aued, and I'm studying Game Development and Production at UTN (Argentina). Before getting into development I studied marketing for a year, and it left me with a habit I still rely on: thinking first about the person who will use what I make.",
       aboutPassion: "I'm passionate about managing and building complex systems in a clean, scalable way.",
